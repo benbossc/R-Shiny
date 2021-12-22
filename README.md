@@ -278,7 +278,7 @@ summarise("Mean" = mean(yield),
 }
 ```
 # Displaying output
-To make the outputs appear on your app in the ```mainPanel```, <strong>they need to be added to the ```ui``` object inside ```mainPanel()``` like so:</strong>
+To make the outputs appear on your app in the ```mainPanel```, <strong>they need to be added to the ```ui``` object inside ```mainPanel()``` like so. We've also added a "sidebarPanel" in h3 HTML and adjusted the positioning of the sidebar.</strong>
 ```R
 ui <- 
   fluidPage(
