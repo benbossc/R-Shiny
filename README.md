@@ -166,7 +166,7 @@ ui <- fluidPage(
       selectInput(inputId = "gen",  # Give the input a name "genotype"
       label = "1. Select genotype",  # Give the input a label to be displayed in the app
       choices = c("A" = "a","B" = "b","C" = "c","D" = "d","E" = "e","F" = "f","G" = "g","H" = "h"), selected = "a"),  # Create the choices that can be selected. e.g. Display "A" and link to value "a"
-    selectInput(inputId = "colour", 
+    selectInput(inputId = "col", 
       label = "2. Select histogram colour", 
       choices = c("blue","green","red","purple","grey"), selected = "grey"),
     sliderInput(inputId = "bin", 
@@ -278,4 +278,27 @@ summarise("Mean" = mean(yield),
 }
 ```
 # Displaying output
-To make the outputs appear on your app in the mainPanel, they need to be added to the ui object inside mainPanel() like so:
+To make the outputs appear on your app in the ```mainPanel```, <strong>they need to be added to the ```ui``` object inside ```mainPanel()``` like so:</strong>
+```R
+ui <- 
+  fluidPage(
+    titlePanel("Barley Yield"),
+    sidebarLayout(
+      position = "right",
+      sidebarPanel(h3("Inputs for histogram"), 
+                   selectInput("gen", "1. Select genotype", choices = c("A" = "a","B" = "b","C" = "c","D" = "d","E" = "e","F" = "f","G" = "g","H" = "h"), selected = "a"),
+                   br(),
+                   selectInput("col", "2. Select histogram colour", choices = c("blue","green","red","purple","grey"), selected = "grey"),
+                   br(),
+                   sliderInput("bin", "3. Select number of histogram bins", min=1, max=25, value= c(10)),
+                   br(),
+                   textInput("text", "4. Enter some text to be displayed", "")),
+                   mainPanel(
+                             plotOutput("myhist"),
+                             tableOutput("mytable"),
+                             textOutput("mytext")
+                             )
+      )
+    )
+```
+ 
