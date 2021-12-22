@@ -301,4 +301,33 @@ ui <-
       )
     )
 ```
- 
+<strong>Take a moment to preview your app via ```Run``` in RStudio.</strong>
+
+#Additional elements
+
+##HTML
+
+To make your app look more pretty, you can add HTML tags like in a normal HTML webpage. Below is a table of basic HTML tags, their Shiny equivalent and a description of what they do:
+<img src = "figures/R-Shiny-fig4.PNG">
+A list of all HTML tags can be found using:
+```R
+shiny::tags
+```
+Some tags may conflict with other functions and so you should always state the source the function comes from by using ```tags$```, e.g.:
+```R
+tags$div()
+```
+Tags can be stacked to apply many arguments to the same object/text, just as in HTML:
+```R
+tags$div(style="color:red",
+  tags$p("Visit us at:"),
+  tags$a(href = "https://ourcodingclub.github.io", "Coding Club")
+  )
+```
+This creates a block of text that is coloured red (```style="color:red"```), within that block there is a paragraph of text (```tags$p("Visit us at?:")```) and a link (```tags$a(href = "http://ourcodingglub.github.io", "Coding Club")```).
+<strong>Add the code above to your Shiny app in ```mainPanel()``` and see what happens!</strong>
+For more information on the arguments that can be included in popular Shiny HTML tags, RStudio have a nice wiki at [[https://shiny.rstudio.com/articles/tag-glossary.html]].
+
+
+
+
