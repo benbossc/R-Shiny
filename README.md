@@ -153,12 +153,129 @@ Now, go back to your ```app.R``` and fill in the code you already have with the 
 
 ```mainPanel()``` indicates that we want a larger main panel. Main panels often contain the output of the app, whether it is a table, map, plot or something else.
 
+# Input Widgets
+Now that we have our basic structure we can start to fill it with inputs and outputs.
 
+The example app has four input widgets, a ```selectInput``` for genotype, a ```selectInput``` for histogram colour, a ```sliderInput``` for number of bins and a ```textInput``` to add some arbitrary text. Each of these widgets provides information on how to display the histogram and its accompanying table. In the example app, all the widgets are found in the ```sidebarPanel``` so the code for these widgets should be put in the ```sidebarPanel``` command like this:
 
+```R
+ui <- fluidPage(
+  titlePanel("Barley Yield"),
+  sidebarLayout(
+    sidebarPanel(
+      selectInput(inputId = "gen",  # Give the input a name "genotype"
+      label = "1. Select genotype",  # Give the input a label to be displayed in the app
+      choices = c("A" = "a","B" = "b","C" = "c","D" = "d","E" = "e","F" = "f","G" = "g","H" = "h"), selected = "a"),  # Create the choices that can be selected. e.g. Display "A" and link to value "a"
+    selectInput(inputId = "colour", 
+      label = "2. Select histogram colour", 
+      choices = c("blue","green","red","purple","grey"), selected = "grey"),
+    sliderInput(inputId = "bin", 
+      label = "3. Select number of histogram bins", 
+      min=1, max=25, value= c(10)),
+    textInput(inputId = "text", 
+      label = "4. Enter some text to be displayed", "")
+    ),
+  mainPanel()
+  )
+)
+```
+Note that ```choices = c("A" = "a" ...``` could be replaced with ```choices = unique(Barley$gen)``` to simply use the groups directly from the dataset.
 
+<strong>Spend a couple of minutes looking at this code so you understand what it means, then fill in your own ```app.R``` with the code.</strong>
 
+Let’s break down ```selectInput()``` to understand what is going on:
 
+1. ```inputId = "genotype"``` gives this input the name ```genotype```, which will become useful when referencing this input later in the app script.
+2. ```label = "1\. Select genotype"``` gives this input a label to be displayed above it in the app.
+3. ```choices = c("A" = "a","B" = "b", ...``` gives a list of choices to be displayed in the dropdown menu (```A, B, etc.```) and the value that is actually gathered from that choice for use in the output (```a, b, etc.```).
+4. ```selected = "grey"``` gives the value from the dropdown menu that is selected by default.
 
+You can look into the arguments presented by the other input widgets by using the help function ```?```. For example, by running the code ```?textInput``` in the R console.
 
+# More Input Widgets
+```R
+actionButton(inputId = "action", label = "Go!")
+```
+```R
+radioButtons(inputId = "radio", label = "Radio Buttons", choices = c("A", "B"))
+```
+```R
+selectInput(inputId = "select", label = "select", choices = c("A", "B"))
+```
+```R
+sliderInput(inputId = "slider", label = "slider", value = 5, min = 1, max = 100)
+```
+Notice how all of the inputs require an ```inputId``` and a ```label``` argument.
 
+# Running a Shiny App
+Take this opportunity to preview your app by clicking "Run App":
+<img src = "figures/R-Shiny-fig2.jpg">
 
+or use the keyboard shortcut ```Cmd + Opt + R``` (Mac), ```Ctrl + Alt + R``` (Windows).
+
+When a Shiny app is running from RStudio, the console cannot be used. To stop the app, click the "Stop" button in the top right of the console window or press the ```Esc``` key.
+
+<img src = "figures/R-Shiny-fig3.jpg">
+
+# Output
+A Shiny app without any outputs is useless. Outputs can be in the form of plots, tables, maps or text.
+
+As per our example app, we’re going to be using ggplot() to create a histogram.
+
+Outputs are created by placing code in the curly brackets (```{}```) in the ```server``` object:
+
+```R
+server <- function(input, output) {
+  output$plot <- renderPlot(ggplot(Barley, aes(x = yield)) +  # Create object called `output$plot` with a ggplot inside it
+  geom_histogram(bins = 7,  # Add a histogram to the plot
+    fill = "grey",  # Make the fill colour grey
+    data = Barley,  # Use data from `Barley`
+    colour = "black")  # Outline the bins in black
+  )                                                       
+}
+```
+<strong>Look at the code above for a couple of minutes to understand what is going on, then add it to your own app.R in the appropriate place.</strong>
+
+Basically, we are creating an object called ```output$plot``` and using ```renderPlot()``` to wrap a ```ggplot()``` command.
+
+# Reactive output
+The histogram is great, but not particularly interactive. We need to link our input widgets to our output object.
+
+We want to select individual genotypes to display in our histogram, which the user can select using the ```selectInput``` that we called ```genotype``` earlier. Use some base R wizardry, ```[]``` ```$``` and ```==```, to select the data we want. <strong>Update ```server``` with the new reactive output arguments so it looks like the code below:</strong>
+```R
+server <- function(input, output) {
+  output$plot <- renderPlot(ggplot(Barley, aes(x = yield)) +
+  geom_histogram(bins = 7,
+      fill = "grey",
+      data = Barley[Barley$gen == input$gen,],
+      colour = "black")
+  )                                                       
+}
+```
+```data = Barley[Barley$Genotype == input$gen,]``` tells ```geom_histogram()``` to only use data where the value in column ```gen``` is equal to (```==```) the value given by ```input$gen```. Note the ```,``` after ```input$gen``` which indicates that we are selecting columns and that all the rows should be selected.
+
+Next, we want to be able to change the colour of the histogram based on the value of the ```selectInput``` called ```colour```. To do this, simply change fill = “grey” to ```fill = input$colour```.
+
+Next, we want to select the number of bins in the histogram using the ```sliderInput``` called ```bin```. Simply change ```bins = 7``` to ```bins = input$bin```.
+
+Finally, to create a table output showing some summary statistics of the selected genotype, create a new output object called ```output$table``` and use ```renderTable()``` to create a table generated using dplyr ```summarise()```. Notice that the ```summarise()``` function from the dplyr is being used; remember using this in a prior lesson/lab? <strong>Update server with the ```output$table``` information so it looks like the code below:</strong>
+```R
+server <- function(input, output) {
+output$myhist <- renderPlot(ggplot(Barley, aes(x = yield)) + 
+	geom_histogram(bins = input$bin, fill = input$col, group=input$gen, 
+		data=Barley[Barley$gen == input$gen,],
+  		colour = "black"))
+
+output$mytext <- renderText(input$text)
+
+output$mytable <- renderTable(Barley %>%
+filter(gen == input$gen) %>%
+summarise("Mean" = mean(yield), 
+  	"Median" = median(yield),
+  	"STDEV" = sd(yield), 
+  	"Min" = min(yield),
+  	"Max" = max(yield)))
+}
+```
+# Displaying output
+To make the outputs appear on your app in the mainPanel, they need to be added to the ui object inside mainPanel() like so:
