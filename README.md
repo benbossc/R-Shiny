@@ -320,11 +320,11 @@ tags$div()
 Tags can be stacked to apply many arguments to the same object/text, just as in HTML:
 ```R
 tags$div(style="color:red",
-  tags$p("Visit us at:"),
-  tags$a(href = "https://ourcodingclub.github.io", "Coding Club")
+  tags$p("Created by:"),
+  tags$a(href = "https://www.nd.edu/", "[Your name], a student a University of Notre Dame")
   )
 ```
-This creates a block of text that is coloured red (```style="color:red"```), within that block there is a paragraph of text (```tags$p("Visit us at?:")```) and a link (```tags$a(href = "http://ourcodingglub.github.io", "Coding Club")```).
+This creates a block of text that is coloured red (```style="color:red"```), within that block there is a paragraph of text (```tags$p("Created by:")```) and a link (```tags$a(href = "https://www.nd.edu/", "[Your name], a student a University of Notre Dame```).
 <strong>Add the code above to your Shiny app in ```mainPanel()``` and see what happens!</strong>
 For more information on the arguments that can be included in popular Shiny HTML tags, RStudio have a nice wiki at [[https://shiny.rstudio.com/articles/tag-glossary.html]].
 
